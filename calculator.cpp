@@ -5,16 +5,75 @@
 #include <stdexcept>
 
 const std::string ADD_COMMAND = "add";
+const std::string SUB_COMMAND = "sub";
 
-void add(std::stack<int> &s){
-	int a = s.top();
+class Number {
+	private:
+		int intval;
+		double doubleval;
+		bool doublemode;
+
+	public:
+		Number(int initial){
+			doublemode = false;
+			intval = initial;
+		}
+
+		Number(double initial){
+			doublemode = true;
+			doubleval = initial;
+		}
+
+		Number operator+(const Number& other) {
+			if(!doublemode && !other.doublemode){
+				return Number(intval + other.intval);
+			}
+			else {
+				return Number((doublemode ? doubleval : intval) + 
+					(other.doublemode ? other.doubleval : other.intval));
+			}
+		}
+
+		Number operator-(const Number& other) {
+			if(!doublemode && !other.doublemode){
+				return Number(intval - other.intval);
+			}
+			else {
+				return Number((doublemode ? doubleval : intval) - 
+					(other.doublemode ? other.doubleval : other.intval));
+			}
+		}
+
+		friend std::ostream& operator<<(std::ostream& os, const Number& num);
+};
+
+std::ostream& operator<<(std::ostream& os, const Number& num) {
+	if(num.doublemode){
+		return os << num.doubleval;
+	}
+	return os << num.intval;
+}
+
+void add(std::stack<Number> &s){
+	Number a = s.top();
 	s.pop();
-	int b = s.top();
+	Number b = s.top();
 	s.pop();
-	int c = a + b;
+	Number c = a + b;
 	s.push(c);
 
 	std::cout << a << " + " << b << " = " << c << '\n';
+}
+
+void sub(std::stack<Number> &s){
+	Number a = s.top();
+	s.pop();
+	Number b = s.top();
+	s.pop();
+	Number c = a - b;
+	s.push(c);
+
+	std::cout << a << " - " << b << " = " << c << '\n';
 }
 
 int main(int argc, char* argv[]) {
@@ -29,20 +88,23 @@ int main(int argc, char* argv[]) {
 
 	// string to be read into
 	std::string word;
-	std::stack<int> s;
+	std::stack<Number> s;
 
 	// read the file while we have input.
 	while (in >> word) {
-		try {
-			if(word == ADD_COMMAND) {
-				add(s);
-			}
-			else{
-				s.push(std::stoi(word));
-			}
+		if(word == ADD_COMMAND) {
+			add(s);
 		}
-		catch (const std::invalid_argument& e){
-			std::cerr << "invalid argument: " << e.what() << '\n';
+		else if(word == SUB_COMMAND) {
+			sub(s);
+		}
+		else{
+			try {
+				s.push(Number(std::stoi(word)));
+			}
+			catch (const std::invalid_argument& e){
+				std::cerr << "invalid argument: " << e.what() << '\n';
+			}
 		}
 	}
 	in.close();
