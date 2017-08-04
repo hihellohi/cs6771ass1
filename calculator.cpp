@@ -148,7 +148,7 @@ void root(std::stack<Number> &s){
 	Number c = a.root();
 	s.push(c);
 
-	std::cout << "root " << a << " = " << c << '\n';
+	std::cout << "sqrt " << a << " = " << c << '\n';
 }
 
 void rev(std::stack<Number> &s){
