@@ -2,13 +2,26 @@
 #include <fstream>
 #include <iomanip>
 #include <stack>
+#include <queue>
 #include <vector>
 #include <stdexcept>
+#include <cmath>
 
 const std::string ADD_COMMAND = "add";
 const std::string SUB_COMMAND = "sub";
 const std::string MULT_COMMAND = "mult";
 const std::string DIV_COMMAND = "div";
+const std::string ROOT_COMMAND = "sqrt";
+const std::string POP_COMMAND = "pop";
+const std::string REV_COMMAND = "reverse";
+const std::string REPEAT_COMMAND = "repeat";
+const std::string END_REPEAT_COMMAND = "endrepeat";
+
+class Number;
+void execute(
+		std::vector<std::string>::iterator start, 
+		std::vector<std::string>::iterator end,
+		std::stack<Number> &s);
 
 class Number {
 	private:
@@ -25,6 +38,10 @@ class Number {
 		Number(double initial){
 			doublemode = true;
 			doubleval = initial;
+		}
+
+		int getIntValue() {
+			return doublemode ? 0 : intval;
 		}
 
 		Number operator+(const Number& other) {
@@ -65,6 +82,10 @@ class Number {
 				return Number((doublemode ? doubleval : intval) / 
 					(double)(other.doublemode ? other.doubleval : other.intval));
 			}
+		}
+
+		Number root() {
+			return Number(sqrt(doublemode ? doubleval : intval));
 		}
 
 		friend std::ostream& operator<<(std::ostream& os, const Number& num);
@@ -121,15 +142,75 @@ void div(std::stack<Number> &s){
 	std::cout << a << " / " << b << " = " << c << '\n';
 }
 
+void root(std::stack<Number> &s){
+	Number a = s.top();
+	s.pop();
+	Number c = a.root();
+	s.push(c);
+
+	std::cout << "root " << a << " = " << c << '\n';
+}
+
+void rev(std::stack<Number> &s){
+	Number a = s.top();
+	s.pop();
+
+	std::queue<Number> q;
+	for(int i = 0; i < a.getIntValue(); i++){
+		q.push(s.top());
+		s.pop();
+	}
+
+	while(!q.empty()){
+		s.push(q.front());
+		q.pop();
+	}
+}
+
+void repeat(
+		std::stack<Number> &s,
+		std::vector<std::string>::iterator &it,
+		std::vector<std::string>::iterator end) {
+
+	Number a = s.top();
+	s.pop();
+	
+	auto start = it + 1;
+	int level = 1;
+	while(level){
+		if(++it == end) break;
+		if(*it == REPEAT_COMMAND) level++;
+		else if(*it == END_REPEAT_COMMAND) level--;
+	}
+
+	for(int i = 0; i < a.getIntValue(); i++){
+		execute(start, it, s);
+	}
+
+	if(it == end) it--;
+}
+
+void push(std::stack<Number> &s, const std::string &word){
+	try {
+		if(word.find('.') == std::string::npos) {
+			s.push(Number(std::stoi(word)));
+		}
+		else {
+			s.push(Number(std::stod(word)));
+		}
+	}
+	catch (const std::invalid_argument& e){
+		std::cerr << "invalid argument: " << word << '\n';
+	}
+}
+
 void execute(
 		std::vector<std::string>::iterator start, 
 		std::vector<std::string>::iterator end,
-		unsigned int repeat,
 		std::stack<Number> &s) {
 
 	std::string word;
-	for(auto j = 0u; j < repeat; j++)
-	for(std::vector<std::string>::iterator it = start; it != end; it++) {
+	for(auto it = start; it != end; it++) {
 
 		word = *it;
 		if(word == ADD_COMMAND) {
@@ -144,18 +225,20 @@ void execute(
 		else if(word == DIV_COMMAND) {
 			div(s);
 		}
+		else if(word == ROOT_COMMAND) {
+			root(s);
+		}
+		else if(word == POP_COMMAND) {
+			s.pop();
+		}
+		else if(word == REV_COMMAND) {
+			rev(s);
+		}
+		else if(word == REPEAT_COMMAND){
+			repeat(s, it, end);
+		}
 		else{
-			try {
-				if(word.find('.') == std::string::npos) {
-					s.push(Number(std::stoi(word)));
-				}
-				else {
-					s.push(Number(std::stod(word)));
-				}
-			}
-			catch (const std::invalid_argument& e){
-				std::cerr << "invalid argument: " << e.what() << '\n';
-			}
+			push(s, word);
 		}
 	}
 }
@@ -181,7 +264,7 @@ int main(int argc, char* argv[]) {
 	in.close();
 
 	std::stack<Number> s;
-	execute(commands.begin(), commands.end(), 1, s);
+	execute(commands.begin(), commands.end(), s);
 
 	return 0;
 }

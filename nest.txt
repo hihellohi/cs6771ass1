@@ -1,0 +1,11 @@
+2100000000
+2 repeat
+2 repeat
+2 repeat
+sqrt
+endrepeat
+endrepeat
+3 repeat
+2 mult
+endrepeat
+endrepeat

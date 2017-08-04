@@ -1,4 +1,7 @@
-2 2 3 add 2 add sub 
+1 2 3 4 pop 3 reverse add 2 add sub 
 2.0 3.5 mult add
 2 4 div
 2 3 div div
+sqrt
+4 sqrt
+
