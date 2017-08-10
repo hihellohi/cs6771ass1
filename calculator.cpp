@@ -7,241 +7,245 @@
 #include <stdexcept>
 #include <cmath>
 
-const std::string ADD_COMMAND = "add";
-const std::string SUB_COMMAND = "sub";
-const std::string MULT_COMMAND = "mult";
-const std::string DIV_COMMAND = "div";
-const std::string ROOT_COMMAND = "sqrt";
-const std::string POP_COMMAND = "pop";
-const std::string REV_COMMAND = "reverse";
-const std::string REPEAT_COMMAND = "repeat";
-const std::string END_REPEAT_COMMAND = "endrepeat";
+namespace comp6771 {
 
-class Number;
-void execute(
-		std::vector<std::string>::iterator start, 
-		std::vector<std::string>::iterator end,
-		std::stack<Number> &s);
+	const std::string ADD_COMMAND = "add";
+	const std::string SUB_COMMAND = "sub";
+	const std::string MULT_COMMAND = "mult";
+	const std::string DIV_COMMAND = "div";
+	const std::string ROOT_COMMAND = "sqrt";
+	const std::string POP_COMMAND = "pop";
+	const std::string REV_COMMAND = "reverse";
+	const std::string REPEAT_COMMAND = "repeat";
+	const std::string END_REPEAT_COMMAND = "endrepeat";
 
-class Number {
-	private:
-		int intval;
-		double doubleval;
-		bool doublemode;
+	class Number {
+		private:
+			int intval;
+			double doubleval;
+			bool doublemode;
 
-	public:
-		Number(int initial){
-			doublemode = false;
-			intval = initial;
-		}
-
-		Number(double initial){
-			doublemode = true;
-			doubleval = initial;
-		}
-
-		int getIntValue() {
-			return doublemode ? 0 : intval;
-		}
-
-		Number operator+(const Number& other) {
-			if(!doublemode && !other.doublemode){
-				return Number(intval + other.intval);
+		public:
+			Number(int initial){
+				doublemode = false;
+				intval = initial;
 			}
-			else {
-				return Number((doublemode ? doubleval : intval) + 
-					(other.doublemode ? other.doubleval : other.intval));
+
+			Number(double initial){
+				doublemode = true;
+				doubleval = initial;
 			}
+
+			int getIntValue() {
+				return doublemode ? 0 : intval;
+			}
+
+			Number operator+(const Number& other) {
+				if(!doublemode && !other.doublemode){
+					return Number(intval + other.intval);
+				}
+				else {
+					return Number((doublemode ? doubleval : intval) + 
+						(other.doublemode ? other.doubleval : other.intval));
+				}
+			}
+
+			Number operator-(const Number& other) {
+				if(!doublemode && !other.doublemode){
+					return Number(intval - other.intval);
+				}
+				else {
+					return Number((doublemode ? doubleval : intval) - 
+						(other.doublemode ? other.doubleval : other.intval));
+				}
+			}
+
+			Number operator*(const Number& other) {
+				if(!doublemode && !other.doublemode){
+					return Number(intval * other.intval);
+				}
+				else {
+					return Number((doublemode ? doubleval : intval) * 
+						(other.doublemode ? other.doubleval : other.intval));
+				}
+			}
+
+			Number operator/(const Number& other) {
+				if(!doublemode && !other.doublemode){
+					return Number(intval / other.intval);
+				}
+				else {
+					return Number((doublemode ? doubleval : intval) / 
+						(other.doublemode ? other.doubleval : other.intval));
+				}
+			}
+
+			Number root() {
+				if(doublemode){
+					return Number(sqrt(doubleval));
+				}
+				else {
+					return Number(static_cast<int>(sqrt(intval)));
+				}
+			}
+
+			friend std::ostream& operator<<(std::ostream& os, const Number& num);
+	};
+
+	void execute(std::vector<std::string>::iterator start, std::vector<std::string>::iterator end, std::stack<Number> &s);
+
+	std::ostream& operator<<(std::ostream& os, const Number& num) {
+		if(num.doublemode){
+			return os << num.doubleval;
 		}
-
-		Number operator-(const Number& other) {
-			if(!doublemode && !other.doublemode){
-				return Number(intval - other.intval);
-			}
-			else {
-				return Number((doublemode ? doubleval : intval) - 
-					(other.doublemode ? other.doubleval : other.intval));
-			}
-		}
-
-		Number operator*(const Number& other) {
-			if(!doublemode && !other.doublemode){
-				return Number(intval * other.intval);
-			}
-			else {
-				return Number((doublemode ? doubleval : intval) * 
-					(other.doublemode ? other.doubleval : other.intval));
-			}
-		}
-
-		Number operator/(const Number& other) {
-			if(!doublemode && !other.doublemode && !(intval % other.intval)){
-				return Number(intval / other.intval);
-			}
-			else {
-				return Number((doublemode ? doubleval : intval) / 
-					(double)(other.doublemode ? other.doubleval : other.intval));
-			}
-		}
-
-		Number root() {
-			return Number(sqrt(doublemode ? doubleval : intval));
-		}
-
-		friend std::ostream& operator<<(std::ostream& os, const Number& num);
-};
-
-std::ostream& operator<<(std::ostream& os, const Number& num) {
-	if(num.doublemode){
-		return os << num.doubleval;
+		return os << num.intval;
 	}
-	return os << num.intval;
-}
 
-void add(std::stack<Number> &s){
-	Number a = s.top();
-	s.pop();
-	Number b = s.top();
-	s.pop();
-	Number c = a + b;
-	s.push(c);
-
-	std::cout << a << " + " << b << " = " << c << '\n';
-}
-
-void sub(std::stack<Number> &s){
-	Number a = s.top();
-	s.pop();
-	Number b = s.top();
-	s.pop();
-	Number c = a - b;
-	s.push(c);
-
-	std::cout << a << " - " << b << " = " << c << '\n';
-}
-
-void mult(std::stack<Number> &s){
-	Number a = s.top();
-	s.pop();
-	Number b = s.top();
-	s.pop();
-	Number c = a * b;
-	s.push(c);
-
-	std::cout << a << " * " << b << " = " << c << '\n';
-}
-
-void div(std::stack<Number> &s){
-	Number a = s.top();
-	s.pop();
-	Number b = s.top();
-	s.pop();
-	Number c = a / b;
-	s.push(c);
-
-	std::cout << a << " / " << b << " = " << c << '\n';
-}
-
-void root(std::stack<Number> &s){
-	Number a = s.top();
-	s.pop();
-	Number c = a.root();
-	s.push(c);
-
-	std::cout << "sqrt " << a << " = " << c << '\n';
-}
-
-void rev(std::stack<Number> &s){
-	Number a = s.top();
-	s.pop();
-
-	std::queue<Number> q;
-	for(int i = 0; i < a.getIntValue(); i++){
-		q.push(s.top());
+	void add(std::stack<Number> &s){
+		Number a = s.top();
 		s.pop();
+		Number b = s.top();
+		s.pop();
+		Number c = a + b;
+		s.push(c);
+
+		std::cout << a << " + " << b << " = " << c << '\n';
 	}
 
-	while(!q.empty()){
-		s.push(q.front());
-		q.pop();
-	}
-}
+	void sub(std::stack<Number> &s){
+		Number a = s.top();
+		s.pop();
+		Number b = s.top();
+		s.pop();
+		Number c = a - b;
+		s.push(c);
 
-void repeat(
-		std::stack<Number> &s,
-		std::vector<std::string>::iterator &it,
-		std::vector<std::string>::iterator end) {
-
-	Number a = s.top();
-	s.pop();
-	
-	auto start = it + 1;
-	int level = 1;
-	while(level){
-		if(++it == end) break;
-		if(*it == REPEAT_COMMAND) level++;
-		else if(*it == END_REPEAT_COMMAND) level--;
+		std::cout << a << " - " << b << " = " << c << '\n';
 	}
 
-	for(int i = 0; i < a.getIntValue(); i++){
-		execute(start, it, s);
+	void mult(std::stack<Number> &s){
+		Number a = s.top();
+		s.pop();
+		Number b = s.top();
+		s.pop();
+		Number c = a * b;
+		s.push(c);
+
+		std::cout << a << " * " << b << " = " << c << '\n';
 	}
 
-	if(it == end) it--;
-}
+	void div(std::stack<Number> &s){
+		Number a = s.top();
+		s.pop();
+		Number b = s.top();
+		s.pop();
+		Number c = a / b;
+		s.push(c);
 
-void push(std::stack<Number> &s, const std::string &word){
-	try {
-		if(word.find('.') == std::string::npos) {
-			s.push(Number(std::stoi(word)));
-		}
-		else {
-			s.push(Number(std::stod(word)));
-		}
+		std::cout << a << " / " << b << " = " << c << '\n';
 	}
-	catch (const std::invalid_argument& e){
-		std::cerr << "invalid argument: " << word << '\n';
+
+	void root(std::stack<Number> &s){
+		Number a = s.top();
+		s.pop();
+		Number c = a.root();
+		s.push(c);
+
+		std::cout << "sqrt " << a << " = " << c << '\n';
 	}
-}
 
-void execute(
-		std::vector<std::string>::iterator start, 
-		std::vector<std::string>::iterator end,
-		std::stack<Number> &s) {
+	void rev(std::stack<Number> &s){
+		Number a = s.top();
+		s.pop();
 
-	std::string word;
-	for(auto it = start; it != end; it++) {
-
-		word = *it;
-		if(word == ADD_COMMAND) {
-			add(s);
-		}
-		else if(word == SUB_COMMAND) {
-			sub(s);
-		}
-		else if(word == MULT_COMMAND) {
-			mult(s);
-		}
-		else if(word == DIV_COMMAND) {
-			div(s);
-		}
-		else if(word == ROOT_COMMAND) {
-			root(s);
-		}
-		else if(word == POP_COMMAND) {
+		std::queue<Number> q;
+		for(int i = 0; i < a.getIntValue(); i++){
+			q.push(s.top());
 			s.pop();
 		}
-		else if(word == REV_COMMAND) {
-			rev(s);
-		}
-		else if(word == REPEAT_COMMAND){
-			repeat(s, it, end);
-		}
-		else{
-			push(s, word);
+
+		while(!q.empty()){
+			s.push(q.front());
+			q.pop();
 		}
 	}
-}
+
+	void repeat(
+			std::stack<Number> &s,
+			std::vector<std::string>::iterator &it,
+			std::vector<std::string>::iterator end) {
+
+		Number a = s.top();
+		s.pop();
+		
+		auto start = it + 1;
+		int level = 1;
+		while(level){
+			if(++it == end) break;
+			if(*it == REPEAT_COMMAND) level++;
+			else if(*it == END_REPEAT_COMMAND) level--;
+		}
+
+		for(int i = 0; i < a.getIntValue(); i++){
+			execute(start, it, s);
+		}
+
+		if(it == end) it--;
+	}
+
+	void push(std::stack<Number> &s, const std::string &word){
+		try {
+			if(word.find('.') == std::string::npos) {
+				s.push(Number(std::stoi(word)));
+			}
+			else {
+				s.push(Number(std::stod(word)));
+			}
+		}
+		catch (const std::invalid_argument& e){
+			std::cerr << "invalid argument: " << word << '\n';
+		}
+	}
+
+	void execute(
+			std::vector<std::string>::iterator start, 
+			std::vector<std::string>::iterator end,
+			std::stack<Number> &s) {
+
+		std::string word;
+		for(auto it = start; it != end; it++) {
+
+			word = *it;
+			if(word == ADD_COMMAND) {
+				add(s);
+			}
+			else if(word == SUB_COMMAND) {
+				sub(s);
+			}
+			else if(word == MULT_COMMAND) {
+				mult(s);
+			}
+			else if(word == DIV_COMMAND) {
+				div(s);
+			}
+			else if(word == ROOT_COMMAND) {
+				root(s);
+			}
+			else if(word == POP_COMMAND) {
+				s.pop();
+			}
+			else if(word == REV_COMMAND) {
+				rev(s);
+			}
+			else if(word == REPEAT_COMMAND){
+				repeat(s, it, end);
+			}
+			else{
+				push(s, word);
+			}
+		}
+	}
+} //comp6771
 
 int main(int argc, char* argv[]) {
 
@@ -263,8 +267,8 @@ int main(int argc, char* argv[]) {
 	}
 	in.close();
 
-	std::stack<Number> s;
-	execute(commands.begin(), commands.end(), s);
+	std::stack<comp6771::Number> s;
+	comp6771::execute(commands.begin(), commands.end(), s);
 
 	return 0;
 }
