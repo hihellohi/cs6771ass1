@@ -8,7 +8,7 @@ endrepeat
 pop
 2.0
 mult
-3 repeat
+3.0 repeat
 2 
 2 reverse
 div

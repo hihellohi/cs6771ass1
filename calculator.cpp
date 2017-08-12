@@ -37,7 +37,7 @@ namespace comp6771 {
 			}
 
 			int getIntValue() {
-				return doublemode ? 0 : intval;
+				return doublemode ? static_cast<int>(doubleval) : intval;
 			}
 
 			Number operator+(const Number& other) {
