@@ -26,15 +26,9 @@ namespace comp6771 {
 			bool doublemode;
 
 		public:
-			Number(int initial){
-				doublemode = false;
-				intval = initial;
-			}
+			Number(int initial) : intval{initial}, doublemode{false} {}
 
-			Number(double initial){
-				doublemode = true;
-				doubleval = initial;
-			}
+			Number(double initial) : doubleval{initial}, doublemode{true} {}
 
 			int getIntValue() {
 				return doublemode ? static_cast<int>(doubleval) : intval;
@@ -91,8 +85,6 @@ namespace comp6771 {
 
 			friend std::ostream& operator<<(std::ostream& os, const Number& num);
 	};
-
-	void execute(std::vector<std::string>::iterator start, std::vector<std::string>::iterator end, std::stack<Number> &s);
 
 	std::ostream& operator<<(std::ostream& os, const Number& num) {
 		if(num.doublemode){
@@ -170,10 +162,10 @@ namespace comp6771 {
 		}
 	}
 
-	void repeat(
-			std::stack<Number> &s,
-			std::vector<std::string>::iterator &it,
-			std::vector<std::string>::iterator end) {
+	//nested repeat
+	void repeat(std::stack<Number> &s, std::vector<std::string>::iterator &it, std::vector<std::string>::iterator end) {
+
+		void execute(std::vector<std::string>::iterator start, std::vector<std::string>::iterator end, std::stack<Number> &s);
 
 		Number a = s.top();
 		s.pop();
